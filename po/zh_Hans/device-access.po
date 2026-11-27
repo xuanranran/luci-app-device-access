@@ -1,0 +1,119 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Device Access"
+msgstr "设备上网控制"
+
+msgid "Restrict internet access by device MAC address. Schedules use the router’s local time."
+msgstr "按设备 MAC 地址限制上网，时段以路由器本地时间为准。"
+
+msgid "Internet destination"
+msgstr "外网出口"
+
+msgid "Firewall zone"
+msgstr "防火墙区域"
+
+msgid "Only routed traffic to this zone is restricted. Flow offloading and transparent proxies can bypass forwarding rules."
+msgstr "规则限制转发到此区域的流量。流量卸载或透明代理可能绕过转发规则。"
+
+msgid "Access rules"
+msgstr "上网规则"
+
+msgid "Enable"
+msgstr "启用"
+
+msgid "Device name"
+msgstr "设备名称"
+
+msgid "Device MAC address"
+msgstr "设备 MAC 地址"
+
+msgid "Policy"
+msgstr "上网策略"
+
+msgid "Always block"
+msgstr "始终断网"
+
+msgid "Block during schedule"
+msgstr "时段内断网"
+
+msgid "Allow only during schedule"
+msgstr "仅时段内允许上网"
+
+msgid "Days"
+msgstr "星期"
+
+msgid "Start time"
+msgstr "开始时间"
+
+msgid "End time"
+msgstr "结束时间"
+
+msgid "An end time before the start continues into the next day."
+msgstr "结束时间早于开始时间时，时段延续至次日。"
+
+msgid "Use 24-hour HH:MM format."
+msgstr "请输入 24 小时制时间，例如 08:00。"
+
+msgid "Start and end must differ."
+msgstr "开始和结束时间必须不同。"
+
+msgid "Mon"
+msgstr "周一"
+
+msgid "Tue"
+msgstr "周二"
+
+msgid "Wed"
+msgstr "周三"
+
+msgid "Thu"
+msgstr "周四"
+
+msgid "Fri"
+msgstr "周五"
+
+msgid "Sat"
+msgstr "周六"
+
+msgid "Sun"
+msgstr "周日"
+
+msgid "IP address"
+msgstr "IP 地址"
+
+msgid "Connection"
+msgstr "连接状态"
+
+msgid "Actions"
+msgstr "操作"
+
+msgid "Reachable"
+msgstr "在线"
+
+msgid "Connection unconfirmed"
+msgstr "连接待确认"
+
+msgid "Block internet"
+msgstr "禁止联网"
+
+msgid "Set internet schedule"
+msgstr "设置联网时段"
+
+msgid "No connected devices detected."
+msgstr "未检测到已连接的设备。"
+
+msgid "Could not load connected devices."
+msgstr "无法读取已连接设备列表。"
+
+msgid "Connected devices"
+msgstr "已连接设备"
+
+msgid "Devices detected by the router. Refresh to check for changes."
+msgstr "显示路由器检测到的设备，点击刷新获取最新状态。"
+
+msgid "Refresh"
+msgstr "刷新"
+
+msgid "Other rules for this device will still apply."
+msgstr "该设备的其他规则仍会生效。"
