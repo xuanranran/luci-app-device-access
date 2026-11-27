@@ -34,13 +34,29 @@ in_window() {
 	return 1
 }
 
+valid_mac() {
+	case "$1" in ''|*[!0-9a-fA-F:]*) return 1 ;; esac
+	printf '%s\n' "$1" | grep -Eiq '^[0-9a-f][02468ace](:[0-9a-f]{2}){5}$' &&
+		[ "$1" != '00:00:00:00:00' ]
+}
+
+profile_aliases() {
+	local section="$1" mac macs
+	config_get macs "$section" macs
+	# MAC tokens are validated individually before they reach the nftables plan.
+	set -f
+	for mac in $macs; do
+		valid_mac "$mac" && printf 'alias %s %s\n' "$mac" "$section"
+	done
+	set +f
+}
+
 client_policy() {
 	local section="$1" enabled mac mode days start end action
 	config_get_bool enabled "$section" enabled 1
 	[ "$enabled" = 1 ] || return 0
 	config_get mac "$section" mac
-	case "$mac" in ''|*[!0-9a-fA-F:]*) return 0 ;; esac
-	printf '%s\n' "$mac" | grep -Eq '^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$' || return 0
+	valid_mac "$mac" || return 0
 	config_get mode "$section" mode always
 
 	case "$mode" in
@@ -81,16 +97,32 @@ render() {
 	now=$(minutes "${clock#* }") || return 1
 
 	config_load device_access || return 1
-	clients=$(config_foreach client_policy device | awk '
-		{ mac = tolower($1); seen[mac] = 1 }
-		$2 == "block" { blocked[mac] = 1 }
-		$2 == "allow" { allowed[mac] = 1 }
-		$2 == "limit" { limited[mac] = 1 }
-		END {
-			for (mac in seen)
-				if (blocked[mac] || (limited[mac] && !allowed[mac]))
-					print mac
-		}' | LC_ALL=C sort | awk '{ printf "%s%s", (NR == 1 ? "" : ", "), $0 }')
+	clients=$(
+		{
+			config_foreach profile_aliases client
+			config_foreach client_policy device
+		} | awk '
+			$1 == "alias" {
+				mac = tolower($2)
+				if (!(mac in groups))
+					groups[mac] = $3
+				next
+			}
+			{
+				mac = tolower($1)
+				group = (mac in groups) ? groups[mac] : mac
+				groups[mac] = group
+			}
+			$2 == "block" { blocked[group] = 1 }
+			$2 == "allow" { allowed[group] = 1 }
+			$2 == "limit" { limited[group] = 1 }
+			END {
+				for (mac in groups) {
+					group = groups[mac]
+					if (blocked[group] || (limited[group] && !allowed[group]))
+						print mac
+				}
+			}' | LC_ALL=C sort | awk '{ printf "%s%s", (NR == 1 ? "" : ", "), $0 }')
 	if [ -n "$clients" ]; then
 		config_get zone main zone wan
 		case "$zone" in ''|*[!a-zA-Z0-9_-]*) return 1 ;; esac
@@ -112,7 +144,7 @@ EOF
 	printf '\t}\n}\n'
 }
 
-refresh() {
+refresh_access() {
 	local rules old_rules
 	rules=$(render) || return 1
 	old_rules=$(cat "$state_dir/rules" 2>/dev/null) || old_rules=''
@@ -125,11 +157,26 @@ refresh() {
 	printf '%s\n' "$rules" >"$state_dir/rules"
 }
 
+refresh_traffic() {
+	ucode /usr/libexec/device-access-traffic.uc
+}
+
+refresh() {
+	local result=0
+	refresh_access || result=1
+	refresh_traffic || result=1
+	return "$result"
+}
+
 clear() {
-	if nft list table inet "$table" >/dev/null 2>&1; then
-		nft delete table inet "$table" || return 1
-	fi
-	rm -f "$state_dir/rules"
+	local name result=0
+	for name in "$table" luci_device_access_traffic; do
+		if nft list table inet "$name" >/dev/null 2>&1; then
+			nft delete table inet "$name" || result=1
+		fi
+	done
+	rm -f "$state_dir/rules" "$state_dir/traffic" "$state_dir/traffic.new"
+	return "$result"
 }
 
 locked() (
@@ -144,10 +191,26 @@ case "$1" in
 	clear) locked clear ;;
 	run)
 		trap 'exit 0' INT TERM
+		last_minute=
+		traffic_ok=1
 		while :; do
-			locked refresh || echo 'Device Access: could not update firewall rules' >&2
-			second=$(date '+%S') || second=55
-			sleep "$(( 60 - ${second#0} ))"
+			now=$(date '+%s') || now=0
+			minute=$(( now / 60 ))
+			if [ "$minute" != "$last_minute" ]; then
+				if locked refresh_access; then
+					last_minute=$minute
+				else
+					echo 'Device Access: could not update access rules' >&2
+				fi
+			fi
+			if locked refresh_traffic; then
+				traffic_ok=1
+			elif [ "$traffic_ok" = 1 ]; then
+				echo 'Device Access: could not update traffic rules' >&2
+				traffic_ok=0
+			fi
+			after=$(date '+%s') || after=$now
+			sleep "$(( 5 - after % 5 ))"
 		done
 		;;
 	*) exit 2 ;;

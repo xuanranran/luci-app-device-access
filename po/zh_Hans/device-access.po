@@ -109,11 +109,68 @@ msgstr "无法读取已连接设备列表。"
 msgid "Connected devices"
 msgstr "已连接设备"
 
-msgid "Devices detected by the router. Refresh to check for changes."
-msgstr "显示路由器检测到的设备，点击刷新获取最新状态。"
-
 msgid "Refresh"
 msgstr "刷新"
 
 msgid "Other rules for this device will still apply."
 msgstr "该设备的其他规则仍会生效。"
+
+msgid "Upload speed"
+msgstr "上传速率"
+
+msgid "Download speed"
+msgstr "下载速率"
+
+msgid "Speeds show traffic forwarded through the selected internet zone."
+msgstr "速率统计所选外网区域的转发流量。"
+
+msgid "Device settings"
+msgstr "设备设置"
+
+msgid "Link to device"
+msgstr "关联已有设备"
+
+msgid "Possible private MAC"
+msgstr "疑似随机 MAC"
+
+msgid "Device profiles"
+msgstr "设备档案"
+
+msgid "Linked MAC addresses share a device name, speed limits and access rules."
+msgstr "关联的 MAC 地址共用设备名称、限速和上网规则。"
+
+msgid "Device MAC addresses"
+msgstr "设备 MAC 地址列表"
+
+msgid "Use a valid unicast MAC address."
+msgstr "请输入有效的单播 MAC 地址。"
+
+msgid "This MAC address is already linked to another device."
+msgstr "此 MAC 地址已关联到另一台设备。"
+
+msgid "Upload limit (kbit/s)"
+msgstr "上传限速（kbit/s）"
+
+msgid "Download limit (kbit/s)"
+msgstr "下载限速（kbit/s）"
+
+msgid "Leave blank or use 0 for unlimited."
+msgstr "留空或填写 0 表示不限速。"
+
+msgid "Enter a whole number."
+msgstr "请输入整数。"
+
+msgid "Choose an existing device"
+msgstr "请选择已有设备"
+
+msgid "Continue"
+msgstr "继续"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "A matching hostname was found. Confirm only if both MAC addresses belong to the same device."
+msgstr "找到主机名相同的设备。请确认两个 MAC 地址属于同一台设备后再关联。"
+
+msgid "Select the existing device if this is one of its MAC addresses."
+msgstr "如果该 MAC 地址属于已有设备，请选择对应设备。"
